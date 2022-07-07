@@ -4,7 +4,7 @@ class Password {
   /**
    * Hash a password with SHA256
    * @param {String} password
-   * @returns {String} <hash.salt>
+   * @returns {String} hash delimited with 'g' then salt
    */
   static toHash(password) {
     const salt = randomBytes(16).toString("hex");
