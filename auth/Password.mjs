@@ -19,11 +19,8 @@ class Password {
    * @returns {Boolean} is correct password
    */
   static compare(hash, str) {
-    // split() returns array
     const [hashedPassword, salt] = hash.split("g");
-    // we hash the new sign-in password
     const re_hash = createHash("sha256").update(`${str}${salt}`).digest("hex")
-    // compare the new supplied password with the stored hashed password
     return re_hash.toString("hex") === hashedPassword;
   }
 }
