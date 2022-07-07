@@ -14,6 +14,7 @@ if (cluster.isPrimary && NODE_ENV === "production") {
   });
 } else {
   const app = express();
+  app.use(express.json());
 
   nsr.RouteFactory.applyRoutesTo(app, {
     api_version: "/v1",
