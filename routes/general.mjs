@@ -32,8 +32,7 @@ const login = async (req, res) => {
     Password === undefined
   )
     return failLogin(res);
-  DAL
-    .getUserByUsername(Username)
+  DAL.getUserByUsername(Username)
     .then((user) => {
       if (!user.Password) return failLogin(res);
       if (PasswordHash.compare(user.Password, Password)) {
@@ -64,7 +63,7 @@ const logout = (req, res) => {
   res.sendStatus(204);
 };
 
-export const routes = [
+export default [
   {
     url: "/login",
     action: NSR.HTTPAction.POST,
