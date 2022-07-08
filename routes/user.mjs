@@ -37,7 +37,10 @@ const getUserById = (req, res) => {
   const id = req.params.usr_id;
   if (id === null || id === undefined) return res.sendStatus(404);
   DAL.getUserById(id)
-    .then((user) => res.status(200).json(user))
+    .then((user) => {
+      if (!user) return res.sendStatus(404);
+      res.status(200).json(user);
+    })
     .catch((err) =>
       res.status(500).json({
         error: err.message,
@@ -127,7 +130,7 @@ export default [
   {
     url: "/user",
     action: NSR.HTTPAction.POST,
-    handlers: [auth, createUser],
+    handlers: [createUser],
   },
   {
     url: "/user",
