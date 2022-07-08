@@ -1,6 +1,7 @@
 import Express from "express";
 import * as NSR from "node-server-router";
 import auth from "../auth/authUser.mjs";
+import DAL from "../db/DAL.mjs";
 
 /**
  * Gets the logged in user.
@@ -14,24 +15,36 @@ const getUser = (req, res) => {
 
 /**
  * Get all the users in the database
- * @todo implement
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
 const getAllUsers = (req, res) => {
-  res.sendStatus(200);
+  DAL.getAllUsers()
+    .then((users) => res.status(200).json(users))
+    .catch((err) =>
+      res
+        .status(500)
+        .json({ error: err.message, status: 500, code: "SERVER_ERROR" })
+    );
 };
 
 /**
- * Get a user by theri id
- * @todo implement
+ * Get a user by their id
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
 const getUserById = (req, res) => {
   const id = req.params.usr_id;
   if (id === null || id === undefined) return res.sendStatus(404);
-  res.sendStatus(200);
+  DAL.getUserById(id)
+    .then((user) => res.status(200).json(user))
+    .catch((err) =>
+      res.status(500).json({
+        error: err.message,
+        status: 500,
+        code: "SERVER_ERROR",
+      })
+    );
 };
 
 /**
@@ -40,26 +53,55 @@ const getUserById = (req, res) => {
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
-const updateUser = (req, res) => {};
+const updateUser = (req, res) => {
+  const updates = Object.keys(req.body).map((key) => ({
+    [key]: req.body[key],
+  }));
+  DAL.updateUser(req.user.UserID, ...updates)
+    .then((user) => res.status(200).json(user))
+    .catch((err) =>
+      res.status(500).json({
+        error: err.message,
+        status: 500,
+        code: "SERVER_ERROR",
+      })
+    );
+};
 
 /**
  * Create a new user. (will hash password)
- * @todo implement
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
 const createUser = (req, res) => {
-  return res.sendStatus(201);
+  DAL.registerUser(req.body)
+    .then((user) => res.status(201).json(user))
+    .catch((err) =>
+      res.status(500).json({
+        error: err.message,
+        status: 500,
+        code: "SERVER_ERROR",
+      })
+    );
 };
 
 /**
  * Delete logged in user.
- * @todo implement
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
 const deleteUser = (req, res) => {
-  return res.sendStatus(204);
+  const id = req.params.usr_id;
+  if (id === null || id === undefined) return res.sendStatus(404);
+  DAL.deleteUser(id)
+    .then(() => res.sendStatus(204))
+    .catch((err) =>
+      res.status(500).json({
+        error: err.message,
+        status: 500,
+        code: "SERVER_ERROR",
+      })
+    );
 };
 
 /**
@@ -94,6 +136,11 @@ export default [
   },
   {
     url: "/user",
+    action: NSR.HTTPAction.DELETE,
+    handlers: [auth, deleteUser],
+  },
+  {
+    url: "/user/:usr_id",
     action: NSR.HTTPAction.DELETE,
     handlers: [auth, deleteUser],
   },
