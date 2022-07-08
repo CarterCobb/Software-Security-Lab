@@ -34,8 +34,8 @@ const getAllUsers = (req, res) => {
  * @param {Express.Response} res
  */
 const getUserById = (req, res) => {
-  const id = req.params.usr_id;
-  if (id === null || id === undefined) return res.sendStatus(404);
+  var id = req.params.usr_id;
+  if (id === null || id === undefined) id = req.user.UserID;
   DAL.getUserById(id)
     .then((user) => {
       if (!user) return res.sendStatus(404);
@@ -57,11 +57,16 @@ const getUserById = (req, res) => {
  * @param {Express.Response} res
  */
 const updateUser = (req, res) => {
+  var id = req.params.usr_id;
+  if (id === null || id === undefined) id = req.user.UserID;
   const updates = Object.keys(req.body).map((key) => ({
     [key]: req.body[key],
   }));
-  DAL.updateUser(req.user.UserID, ...updates)
-    .then((user) => res.status(200).json(user))
+  DAL.updateUser(id, ...updates)
+    .then((user) => {
+      if (!user) return res.sendStatus(404);
+      res.status(200).json(user);
+    })
     .catch((err) =>
       res.status(500).json({
         error: err.message,
@@ -94,8 +99,8 @@ const createUser = (req, res) => {
  * @param {Express.Response} res
  */
 const deleteUser = (req, res) => {
-  const id = req.params.usr_id;
-  if (id === null || id === undefined) return res.sendStatus(404);
+  var id = req.params.usr_id;
+  if (id === null || id === undefined) id = req.user.UserID;
   DAL.deleteUser(id)
     .then(() => res.sendStatus(204))
     .catch((err) =>
@@ -135,6 +140,11 @@ export default [
   {
     url: "/user",
     action: NSR.HTTPAction.PATCH,
+    handlers: [auth, updateUser],
+  },
+  {
+    url: "/user/:usr_id",
+    action: NSR.HTTPAction.PUT,
     handlers: [auth, updateUser],
   },
   {
