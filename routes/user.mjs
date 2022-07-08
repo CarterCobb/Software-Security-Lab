@@ -52,7 +52,6 @@ const getUserById = (req, res) => {
 
 /**
  * Update any or all properties of a user.
- * @todo implement
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
