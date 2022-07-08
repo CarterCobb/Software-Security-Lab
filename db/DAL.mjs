@@ -48,21 +48,19 @@ class DAL {
       .request()
       .input("userID", sql.Int, id)
       .query("SELECT * FROM [User] WHERE UserID = @userID");
-    console.log(data.recordset);
     return data.recordset[0];
   }
 
   /**
    * Get a user by their `Username`
-   * @param {Promise<{Username: String, Password: String}>} id
+   * @param {String} username
    */
-  static async getUserByUsername(id) {
+  static async getUserByUsername(username) {
     const pool = await sql.connect(sqlConfig);
     const data = await pool
       .request()
-      .input("username", sql.Int, id)
+      .input("username", sql.VarChar(450), username)
       .query("SELECT * FROM [User] WHERE Username = @username");
-    console.log(data.recordset);
     return data.recordset[0];
   }
 
@@ -73,8 +71,13 @@ class DAL {
   static async getAllUsers() {
     const pool = await sql.connect(sqlConfig);
     const data = await pool.request().query("SELECT * FROM [User]");
-    console.log(data);
-    return data.recordset;
+    const users = [];
+    for (var record of data.recordset) {
+      var user = record;
+      delete user.Password;
+      users.push(user);
+    }
+    return users;
   }
 
   /**
@@ -186,7 +189,7 @@ class DAL {
    */
   static async setSession(sessionId, session, cb) {
     let pool = await sql.connect(sqlConfig);
-    let data = await pool
+    await pool
       .request()
       .input("sessionId", sql.NVarChar(450), sessionId)
       .input("sessionData", sql.NVarChar(sql.MAX), JSON.stringify(session))
