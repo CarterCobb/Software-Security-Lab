@@ -34,7 +34,7 @@ const login = async (req, res) => {
     return failLogin(res);
   DAL.getUserByUsername(Username)
     .then((user) => {
-      if (!user.Password) return failLogin(res);
+      if (!user || !user.Password) return failLogin(res);
       if (PasswordHash.compare(user.Password, Password)) {
         const token = `Bearer ${generateToken(user.UserID)}`;
         req.session.token = token;
