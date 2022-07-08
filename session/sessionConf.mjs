@@ -39,9 +39,9 @@ export default class SessionConfig {
       }`
     );
     // ------------- FOR DEBUGGING -------------
-    app.use((req, _, next) => {
-      console.log(req.session);
-      next();
-    });
+    // app.use((req, _, next) => {
+    //   console.log(req.session);
+    //   next();
+    // });
   }
 }
