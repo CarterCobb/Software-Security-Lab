@@ -178,7 +178,10 @@ class DAL {
       .request()
       .input("sessionID", sql.NVarChar(450), id)
       .query("SELECT SessionData FROM [Session] WHERE SessionID = @sessionId;");
-    cb(null, data.recordset[0] || {});
+    cb(
+      null,
+      data.recordset[0] ? JSON.parse(data.recordset[0].SessionData) : null
+    );
   }
 
   /**
